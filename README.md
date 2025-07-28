@@ -1,0 +1,110 @@
+# Motion Canvas Narrator:
+
+Motion Canvas Narrator seamlessly integrates narration into your Motion Canvas workflow.
+Inspired by Motion Canvas' idea of letting your code define your animations, this package allows you to define narrations in code, making it easy to synchronize voiceovers and subtitles with your animations.
+You define your narrations and let them guide you through your voice recordings while displaying subtitles in the editor - or you let AI generate the audio for you.
+
+
+Please note that this package is still in early development, so expect some bugs and missing features. Contributions and suggestions are highly welcome!
+
+
+## Features
+- **Narration in Code**: Define your narrations directly in your Motion Canvas code.
+- **AI Narration**: Use AI to generate voiceovers from text.
+- **Custom Providers**: Easily add your own TTS providers (contributions welcome!).
+- **Subtitles**: Display subtitles with your narrations.
+- **Server Caching**: Cache audio files on the server to avoid re-generating them.
+- **Mock Narrator**: For testing without audio generation, useful for planning scripts and subtitles.
+
+## Provider Support
+
+| **Provider**	      | **TTS** 	  |  **Voice Cloning** 	  |  **Fine Grained Timestamps** 	  | **Remarks**      |
+|--------------------|:----------:|:---------------------:|:-------------------------------:|------------------|
+| **ElevenLabs** 	   |    ✅ 	     |           	           |                	                | Requires Account |
+| **Open AI**    	   |     	      |           	           |                	                | Missing          |
+| **Google TTS** 	   |     	      |           	           |                	                | Missing          |
+| **speechify**  	   |     	      |           	           |                	                | Missing        |
+
+
+Other potential providers:
+- [piper1](https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/API_HTTP.md): GPL licensed, can be easily set up on your machine.
+- [Web Speech API](https://github.com/mdn/dom-examples/blob/main/web-speech-api/speak-easy-synthesis/script.js): Built-in browser TTS, no API key required, but does not support exporting audio files.
+- [speechify](https://speechify.com/)
+
+
+## Planned Features
+
+- **In-Editor Recording**: Record your own narrations directly in the Motion Canvas editor.
+- **Caption Export**: Export subtitles in various formats (e.g., WebVTT).
+- **Detailed Timestamping**: Timestamps for individual characters and words allow better synchronization and subtitles ([example](https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps)).
+
+
+## Usage
+
+Using Motion Canvas Narrator in your Motion Canvas project is straightforward and only requires a few steps to set up.
+
+### 1. Install the Package
+
+```bash
+npm install motion-canvas-narrator
+```
+
+### 2. Enable the Narrator Plugin in your *vite.config.ts*
+This plugin is responsible for caching audio files on the server, so you don't have to re-generate them every time you run your project.
+You only need to add the plugin to your `vite.config.ts` file:
+
+
+
+```typescript
+import {defineConfig} from 'vite';
+import motionCanvas from '@motion-canvas/vite-plugin';
+import ffmpeg from '@motion-canvas/ffmpeg';
+import { motionCanvasNarratorPlugin } from 'motion-canvas-narrator';
+
+export default defineConfig({
+  plugins: [
+    motionCanvas(),
+    ffmpeg(), // make sure that you setup ffmpeg to export audio as well
+    // Add the narrator plugin for server-side audio caching:
+    motionCanvasNarratorPlugin(),
+  ]
+});
+```
+
+
+### 3. Create a Narrator (e.g., using ElevenLabs)
+The narrator is the main interface for generating audio from text.
+
+```typescript
+import { createElevenLabsNarrator } from 'motion-canvas-narrator';
+const narrator = createElevenLabsNarrator({
+  apiKey: YOUR_ELEVENLABS_API_KEY,
+  voiceId: 'your-voice-id',
+});
+```
+
+### 4. Use the Narrator in Your Motion Canvas Project
+To use the narrator, you can start narrations in your scenes as simple as:
+```typescript
+  yield* narrator.speak("Welcome!");
+```
+This will generate frames for the duration of the narration.
+Note that the narration seamlessly integrates with Motion Canvas' animation system, allowing you to synchronize animations with the narration, using `all` for example:
+
+```typescript
+  yield* all(
+      // ... other animations ...
+    narrator.speak("Welcome!")
+  );
+```
+
+You will find the example project that includes subtitles used for the demo video here: [Example Project](https://github.com/prathje/motion-canvas-narrator)
+
+## Contributing
+
+If you want to contribute to this project, feel free to open issues or pull requests.
+
+
+## Todos
+NarrationProvider should be in its own file
+NarratorOptions should be passed to generate the ID as well
