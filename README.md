@@ -7,6 +7,11 @@ You define your narrations and let them guide you through your voice recordings 
 
 Please note that this package is still in early development, so expect some bugs and missing features. Contributions and suggestions are highly welcome!
 
+## Demo Video (Make sure to enable audio!)
+https://github.com/user-attachments/assets/bafdc53d-0370-4efa-b15d-4376cd10462b
+
+The source code is available here: [Example Project](https://github.com/prathje/motion-canvas-narrator-example-project)
+
 
 ## Features
 - **Narration in Code**: Define your narrations directly in your Motion Canvas code.
@@ -46,7 +51,7 @@ Using Motion Canvas Narrator in your Motion Canvas project is straightforward an
 ### 1. Install the Package
 
 ```bash
-npm install motion-canvas-narrator
+npm install https://github.com/prathje/motion-canvas-narrator.git
 ```
 
 ### 2. Enable the Narrator Plugin in your *vite.config.ts*
@@ -59,7 +64,8 @@ You only need to add the plugin to your `vite.config.ts` file:
 import {defineConfig} from 'vite';
 import motionCanvas from '@motion-canvas/vite-plugin';
 import ffmpeg from '@motion-canvas/ffmpeg';
-import { motionCanvasNarratorPlugin } from 'motion-canvas-narrator';
+
+import { motionCanvasNarratorPlugin } from 'motion-canvas-narrator/vite-plugin';
 
 export default defineConfig({
   plugins: [
@@ -78,8 +84,9 @@ The narrator is the main interface for generating audio from text.
 ```typescript
 import { createElevenLabsNarrator } from 'motion-canvas-narrator';
 const narrator = createElevenLabsNarrator({
-  apiKey: YOUR_ELEVENLABS_API_KEY,
-  voiceId: 'your-voice-id',
+    modelId: 'eleven_v3',
+    voiceId: 'JBFqnCBsd6RMkjVDRZzb',
+    apiKey: '<YOUR_ELEVENLABS_API_KEY>'
 });
 ```
 
@@ -98,7 +105,7 @@ Note that the narration seamlessly integrates with Motion Canvas' animation syst
   );
 ```
 
-You will find the example project that includes subtitles used for the demo video here: [Example Project](https://github.com/prathje/motion-canvas-narrator)
+You will find the example project that includes subtitles used for the demo video here: [Example Project](https://github.com/prathje/motion-canvas-narrator-example-project)
 
 ## Contributing
 
