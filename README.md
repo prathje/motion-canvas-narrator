@@ -5,7 +5,7 @@ Inspired by Motion Canvas' idea of letting your code define your animations, thi
 You define your narrations and let them guide you through your voice recordings while displaying subtitles in the editor - or you let AI generate the audio for you.
 
 
-Please note that this package is still in early development, so expect some bugs and missing features. Contributions and suggestions are highly welcome!
+Please note that this package is still in early development, so some bugs and missing features are expected. Contributions and suggestions are highly welcome!
 
 ## Demo Video (Make sure to enable audio!)
 https://github.com/user-attachments/assets/bafdc53d-0370-4efa-b15d-4376cd10462b
@@ -17,7 +17,6 @@ The source code is available here: [Example Project](https://github.com/prathje/
 - **Narration in Code**: Define your narrations directly in your Motion Canvas code.
 - **AI Narration**: Use AI to generate voiceovers from text.
 - **Custom Providers**: Easily add your own TTS providers (contributions welcome!).
-- **Subtitles**: Display subtitles with your narrations.
 - **Server Caching**: Cache audio files on the server to avoid re-generating them.
 - **Mock Narrator**: For testing without audio generation, useful for planning scripts and subtitles.
 
@@ -40,6 +39,7 @@ Other potential providers:
 ## Planned Features
 
 - **In-Editor Recording**: Record your own narrations directly in the Motion Canvas editor.
+- **Subtitles**: Display precise subtitles with your narrations (check out the example project for rudimentary subtitles).
 - **Caption Export**: Export subtitles in various formats (e.g., WebVTT).
 - **Detailed Timestamping**: Timestamps for individual characters and words allow better synchronization and subtitles ([example](https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps)).
 
@@ -47,6 +47,7 @@ Other potential providers:
 ## Usage
 
 Using Motion Canvas Narrator in your Motion Canvas project is straightforward and only requires a few steps to set up.
+You can also check out the example project that includes subtitles used for the demo video here: [Example Project](https://github.com/prathje/motion-canvas-narrator-example-project)
 
 ### 1. Install the Package
 
@@ -79,7 +80,7 @@ export default defineConfig({
 
 
 ### 3. Create a Narrator (e.g., using ElevenLabs)
-The narrator is the main interface for generating audio from text.
+The narrator serves as the primary interface for generating audio from text.
 
 ```typescript
 import { createElevenLabsNarrator } from 'motion-canvas-narrator';
@@ -91,7 +92,7 @@ const narrator = createElevenLabsNarrator({
 ```
 
 ### 4. Use the Narrator in Your Motion Canvas Project
-To use the narrator, you can start narrations in your scenes as simple as:
+To use the narrator, you can start narrations in your scenes as simply as:
 ```typescript
   yield* narrator.speak("Welcome!");
 ```
@@ -105,13 +106,6 @@ Note that the narration seamlessly integrates with Motion Canvas' animation syst
   );
 ```
 
-You will find the example project that includes subtitles used for the demo video here: [Example Project](https://github.com/prathje/motion-canvas-narrator-example-project)
-
 ## Contributing
 
-If you want to contribute to this project, feel free to open issues or pull requests.
-
-
-## Todos
-NarrationProvider should be in its own file
-NarratorOptions should be passed to generate the ID as well
+If you'd like to contribute to this project, please feel free to open issues or pull requests.
