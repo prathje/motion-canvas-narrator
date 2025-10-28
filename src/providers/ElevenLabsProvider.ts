@@ -36,10 +36,10 @@ export class ElevenLabsProvider implements NarrationProvider {
     options: NarrationOptions,
   ): Promise<Narration> {
     console.log(
-      `Fetching audio from ElevenLabs API for: "${text.substring(
+      `[ElevenLabs] 🚀 Starting API call for: "${text.substring(
         0,
         50,
-      )}..."`,
+      )}..." (Voice: ${this.config.voiceId}, Model: ${this.config.modelId})`,
     );
 
     try {
@@ -49,9 +49,12 @@ export class ElevenLabsProvider implements NarrationProvider {
       let ElevenLabsClient: any;
 
       try {
+        console.log('[ElevenLabs] Importing @elevenlabs/elevenlabs-js...');
         ElevenLabsModule = (await import('@elevenlabs/elevenlabs-js')) as any;
         ElevenLabsClient = ElevenLabsModule.ElevenLabsClient;
+        console.log('[ElevenLabs] ✅ Successfully imported ElevenLabs module');
       } catch (importError) {
+        console.error('[ElevenLabs] ❌ Failed to import @elevenlabs/elevenlabs-js:', importError);
         throw new Error(
           'ElevenLabs package not installed. Install it with: npm install @elevenlabs/elevenlabs-js',
         );
@@ -63,10 +66,12 @@ export class ElevenLabsProvider implements NarrationProvider {
         );
       }
 
+      console.log('[ElevenLabs] Creating ElevenLabsClient with API key...');
       const elevenlabs = new ElevenLabsClient({
         apiKey: this.config.apiKey!,
       });
 
+      console.log('[ElevenLabs] Calling textToSpeech.convert()...');
       const audioStream = await elevenlabs.textToSpeech.convert(
         this.config.voiceId,
         {
@@ -74,12 +79,16 @@ export class ElevenLabsProvider implements NarrationProvider {
           modelId: this.config.modelId!,
         },
       );
+      console.log('[ElevenLabs] ✅ Got audio stream from API');
 
       // Convert ReadableStream to ArrayBuffer
+      console.log('[ElevenLabs] Converting stream to ArrayBuffer...');
       const audioBuffer = await AudioUtils.streamToArrayBuffer(audioStream);
+      console.log('[ElevenLabs] ✅ Converted to ArrayBuffer, size:', audioBuffer.byteLength, 'bytes');
 
       const audioBlob = new Blob([audioBuffer], {type: 'audio/mpeg'});
       const duration = await AudioUtils.getAudioDuration(audioBlob);
+      console.log('[ElevenLabs] ✅ Audio duration:', duration.toFixed(2), 'seconds');
 
       // Create blob URL for audio
       const audioUrl = URL.createObjectURL(audioBlob);
@@ -90,10 +99,10 @@ export class ElevenLabsProvider implements NarrationProvider {
 
       const id = this.generateId(text, options);
 
-      console.log(`Audio with duration ${duration} generated`);
+      console.log(`[ElevenLabs] ✅ Successfully generated audio for: "${text.substring(0, 50)}..." (${duration.toFixed(2)}s)`);
       return new Narration(id, text, duration, sound);
     } catch (error) {
-      console.error('ElevenLabs API error:', error);
+      console.error('[ElevenLabs] ❌ API error:', error);
       const duration = text.split(' ').length / 2.5;
       
       const sound = {
@@ -101,6 +110,7 @@ export class ElevenLabsProvider implements NarrationProvider {
       };
       const id = this.generateId(text, options);
 
+      console.log(`[ElevenLabs] ⚠️  Returning fallback narration with ${duration.toFixed(2)}s duration`);
       return new Narration(id, text, duration, sound);
     }
   }
