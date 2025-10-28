@@ -1,0 +1,20 @@
+{
+  "name": "my-chirp-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@motion-canvas/2d": "^3.17.2",
+    "@motion-canvas/core": "^3.17.2",
+    "@motion-canvas/vite-plugin": "^3.17.2",
+    "ffmpeg": "^0.0.4",
+    "vite": "^7.1.12"
+  }
+}

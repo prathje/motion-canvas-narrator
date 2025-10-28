@@ -6,6 +6,10 @@ import {
 import {FileProvider, FileProviderConfig} from './providers/FileProvider';
 import {MockProvider} from './providers/MockProvider';
 import {CachedProvider} from "./providers/CachedProvider";
+import {
+  GoogleChirpConfig,
+  GoogleChirpProvider,
+} from './providers/GoogleChirpProvider';
 
 // Mock provider factory
 export function createMockNarrator(
@@ -24,6 +28,15 @@ export function createElevenLabsNarrator(
   narratorConfig: NarratorConfig = {},
 ): Narrator {
   const provider = new CachedProvider(new ElevenLabsProvider(providerConfig));
+  return new Narrator(provider, narratorConfig);
+}
+
+// Google Chirp provider factory
+export function createGoogleChirpNarrator(
+  providerConfig: GoogleChirpConfig,
+  narratorConfig: NarratorConfig = {},
+): Narrator {
+  const provider = new CachedProvider(new GoogleChirpProvider(providerConfig));
   return new Narrator(provider, narratorConfig);
 }
 
