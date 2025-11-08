@@ -14,27 +14,26 @@ export class FileProvider implements NarrationProvider {
     this.config = config;
   }
 
-  public generateId(text: string, _options: NarrationOptions): string {
+  public generateId(options: NarrationOptions): string {
     const audioDirectory = this.config.audioDirectory || 'default';
-    return AudioUtils.generateAudioId(text, ['file', audioDirectory]);
+    return AudioUtils.generateAudioId(options.text, ['file', audioDirectory]);
   }
 
   public async resolve(
     _narrator: Narrator,
-    text: string,
-    options: NarrationOptions,
+    options: NarrationOptions
   ): Promise<Narration> {
+
+    const text = options.text;
+
     // For FileProvider, the "text" parameter should be the file path
     const audioUrl = this.resolveAudioPath(text);
-    const sound = {
-      audio: audioUrl,
-    };
 
     // Get actual audio duration
     const duration = await this.getAudioDuration(audioUrl);
-    const id = this.generateId(text, options);
+    const id = this.generateId(options);
 
-    return new Narration(id, text, duration, sound);
+    return new Narration(id, text, duration, audioUrl);
   }
 
   private resolveAudioPath(filePath: string): string {

@@ -57,8 +57,8 @@ export class MinimaxProvider implements NarrationProvider {
     };
   }
 
-  public generateId(text: string, _options: NarrationOptions): string {
-    return AudioUtils.generateAudioId(text, [
+  public generateId(options: NarrationOptions): string {
+    return AudioUtils.generateAudioId(options.text, [
       this.config.voiceId,
       this.config.model ?? 'speech-2.6-turbo',
       this.config.format ?? 'mp3',
@@ -67,9 +67,11 @@ export class MinimaxProvider implements NarrationProvider {
 
   public async resolve(
     _narrator: Narrator,
-    text: string,
     options: NarrationOptions,
   ): Promise<Narration> {
+
+    const text = options.text;
+
     console.log(
       `Fetching audio from MiniMax API for: "${text.substring(0, 50)}..."`,
     );
@@ -81,7 +83,7 @@ export class MinimaxProvider implements NarrationProvider {
           Authorization: `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(this.buildRequestBody(text, options)),
+        body: JSON.stringify(this.buildRequestBody(options)),
       });
 
       if (!response.ok) {
@@ -109,24 +111,18 @@ export class MinimaxProvider implements NarrationProvider {
       const duration = await AudioUtils.getAudioDuration(audioBlob);
       const audioUrl = URL.createObjectURL(audioBlob);
 
-      const sound = {
-        audio: audioUrl,
-      };
 
-      const id = this.generateId(text, options);
+      const id = this.generateId(options);
 
       console.log(`Audio with duration ${duration} generated`);
-      return new Narration(id, text, duration, sound);
+      return new Narration(id, text, duration, audioUrl);
     } catch (error) {
       console.error('MiniMax API error:', error);
       const duration = text.split(' ').length / 2.5;
 
-      const sound = {
-        audio: '',
-      };
-      const id = this.generateId(text, options);
+      const id = this.generateId(options);
 
-      return new Narration(id, text, duration, sound);
+      return new Narration(id, text, duration, '');
     }
   }
 
@@ -134,7 +130,7 @@ export class MinimaxProvider implements NarrationProvider {
     return this.config.endpoint ?? this.defaultEndpoint;
   }
 
-  private buildRequestBody(text: string, _options: NarrationOptions): Record<string, any> {
+  private buildRequestBody(options: NarrationOptions): Record<string, any> {
     const {
       voiceId,
       model,
@@ -149,6 +145,8 @@ export class MinimaxProvider implements NarrationProvider {
       subtitle,
       outputFormat,
     } = this.config;
+
+    const text = options.text;
 
     const body: Record<string, any> = {
       model,

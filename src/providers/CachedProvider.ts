@@ -13,17 +13,17 @@ export class CachedProvider implements NarrationProvider {
     this.audioCache = AudioCache.getInstance();
   }
 
-  public generateId(text: string, options: NarrationOptions): string {
+  public generateId(options: NarrationOptions): string {
     // For cached provider, use the inner provider's generateId method
-    return this.innerProvider.generateId(text, options);
+    return this.innerProvider.generateId(options);
   }
 
   public async resolve(
     narrator: Narrator,
-    text: string,
-    options: NarrationOptions,
+    options: NarrationOptions
   ): Promise<Narration> {
-    const cacheKey = this.generateId(text, options);
+    const text = options.text;
+    const cacheKey = this.generateId(options);
 
     // First check in-memory cache
     let cachedResult = this.audioCache.get(cacheKey);
@@ -36,17 +36,17 @@ export class CachedProvider implements NarrationProvider {
     // If still not found, delegate to inner provider
     if (!cachedResult) {
       console.log(`Cache miss for "${text.substring(0, 50)}..." - delegating to ${this.innerProvider.name}`);
-      
-      const narration = await this.innerProvider.resolve(narrator, text, options);
-      
+
+      const narration = await this.innerProvider.resolve(narrator, options);
+
       // Cache the result if we got valid audio
-      if (narration.sound.audio) {
+      if (narration.audio) {
         // Extract audio data for server upload if needed
-        if (narration.sound.audio.startsWith('blob:')) {
+        if (narration.audio.startsWith('blob:')) {
           try {
-            const response = await fetch(narration.sound.audio);
+            const response = await fetch(narration.audio);
             const audioBuffer = await response.arrayBuffer();
-            
+
             // Upload to server cache
             await this.audioCache.uploadToServer(cacheKey, audioBuffer, narration.duration, {
               generatedAt: new Date().toISOString()
@@ -57,19 +57,15 @@ export class CachedProvider implements NarrationProvider {
         }
 
         // Cache in memory
-        this.audioCache.cacheAudioResult(cacheKey, narration.sound.audio, narration.duration);
+        this.audioCache.cacheAudioResult(cacheKey, narration.audio, narration.duration);
       }
-      
+
       return narration;
     } else {
       console.log(`Cache hit for "${text.substring(0, 50)}..."`);
-      
-      const sound = {
-        audio: cachedResult.audioUrl,
-      };
-      const id = this.generateId(text, options);
-      
-      return new Narration(id, text, cachedResult.duration, sound);
+
+      const id = this.generateId(options);
+      return new Narration(id, options.text, cachedResult.duration, cachedResult.audioUrl);
     }
   }
 }

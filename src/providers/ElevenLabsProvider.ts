@@ -26,15 +26,16 @@ export class ElevenLabsProvider implements NarrationProvider {
     }
   }
 
-  public generateId(text: string, _options: NarrationOptions): string {
-    return AudioUtils.generateAudioId(text, [this.config.voiceId, this.config.modelId!]);
+  public generateId(options: NarrationOptions): string {
+    return AudioUtils.generateAudioId(options.text, [this.config.voiceId, this.config.modelId!]);
   }
 
   public async resolve(
     _narrator: Narrator,
-    text: string,
-    options: NarrationOptions,
+    options: NarrationOptions
   ): Promise<Narration> {
+    const text = options.text;
+
     console.log(
       `Fetching audio from ElevenLabs API for: "${text.substring(
         0,
@@ -84,24 +85,17 @@ export class ElevenLabsProvider implements NarrationProvider {
       // Create blob URL for audio
       const audioUrl = URL.createObjectURL(audioBlob);
 
-      const sound = {
-        audio: audioUrl,
-      };
-
-      const id = this.generateId(text, options);
+      const id = this.generateId(options);
 
       console.log(`Audio with duration ${duration} generated`);
-      return new Narration(id, text, duration, sound);
+      return new Narration(id, text, duration, audioUrl);
     } catch (error) {
       console.error('ElevenLabs API error:', error);
       const duration = text.split(' ').length / 2.5;
-      
-      const sound = {
-        audio: '',
-      };
-      const id = this.generateId(text, options);
 
-      return new Narration(id, text, duration, sound);
+      const id = this.generateId(options);
+
+      return new Narration(id, text, duration, '');
     }
   }
 

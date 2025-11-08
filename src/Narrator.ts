@@ -1,5 +1,5 @@
 import {useScene, waitFor, threadable} from '@motion-canvas/core';
-import {SoundSettings, ThreadGenerator} from '@motion-canvas/core';
+import {ThreadGenerator} from '@motion-canvas/core';
 import {Narration} from './Narration';
 
 export interface NarratorConfig {
@@ -8,56 +8,71 @@ export interface NarratorConfig {
 
 export interface NarrationProvider {
   name: string;
-  generateId(text: string, options: NarrationOptions): string;
+  generateId(options: NarrationOptions): string;
   resolve(
     narrator: Narrator,
-    text: string,
-    options: NarrationOptions,
+    textOrOptions: string|NarrationOptions,
   ): Narration | Promise<Narration>;
 }
 
 export interface NarrationOptions {
-  soundSettings?: SoundSettings; // Custom sound settings
+  text: string, // the main text to be narrated
   [key: string]: any; // Allow provider-specific settings
+}
+
+export interface NarrationPlaybackOptions {
+  playbackRate?: number;
+  gain?: number;
+  detune?: number;
 }
 
 export class Narrator {
   private provider: NarrationProvider;
   public readonly config: NarratorConfig;
+  public defaultPlaybackOptions: NarrationPlaybackOptions = {}; // default playback options
 
   constructor(provider: NarrationProvider, config: NarratorConfig = {}) {
     this.provider = provider;
     this.config = config;
   }
 
-  public async resolve(
-    text: string,
-    options: NarrationOptions = {},
-  ): Promise<Narration> {
-    return await this.provider.resolve(this, text, options);
+  public setDefaultPlaybackOptions(options: NarrationPlaybackOptions) {
+    this.defaultPlaybackOptions = options;
+  }
+
+  public async resolve(textOrOptions: string|NarrationOptions): Promise<Narration> {
+    const options = typeof textOrOptions === 'string' ? {text: textOrOptions} : textOrOptions;
+    return this.provider.resolve(this, options);
   }
 
   @threadable()
-  public *speak(text: string, options: NarrationOptions = {}): ThreadGenerator {
-    // Await the narration preparation
-    const narration: Narration = yield this.resolve(text, options);
+  public *speak(textOrOptions: string|NarrationOptions, playbackOptions: NarrationPlaybackOptions = {}): ThreadGenerator {
+
+    // Await the narration preparation by yielding the promise
+    const narration: Narration = yield this.resolve(textOrOptions);
 
     // and start it
-    yield* this.start(narration, options);
+    yield* this.start(narration, playbackOptions);
   }
 
   @threadable()
-  public *start(narration: Narration, options: NarrationOptions = {}): ThreadGenerator {
+  public *start(narration: Narration, playbackOptions: NarrationPlaybackOptions|null = null): ThreadGenerator {
     // Get scene within the generator context
     const scene = useScene();
 
-    if (narration.sound.audio) {
-      // Add sound, no offset for now
-      // Support both direct options and soundSettings for convenience
-      narration.sound.playbackRate = options?.playbackRate ?? options?.soundSettings?.playbackRate ?? 1;
-      narration.sound.gain = options?.gain ?? options?.soundSettings?.gain ?? 0;
-      narration.sound.detune = options?.detune ?? options?.soundSettings?.detune ?? 0;
-      scene.sounds.add(narration.sound, 0);
+    if (narration.audio) {
+      if (playbackOptions === null) {
+        playbackOptions = this.defaultPlaybackOptions; // use narrator's default playback options if none provided
+      }
+
+      const sound = {
+        audio: narration.audio,
+        playbackRate: playbackOptions.playbackRate ?? 1,
+        gain: playbackOptions.gain ?? 0,
+        detune: playbackOptions.detune ?? 0,
+      };
+
+      scene.sounds.add(sound, 0);
     } else {
       console.warn(`No audio provided for narration: ${narration.text}`);
     }

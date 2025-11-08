@@ -10,23 +10,19 @@ export class MockProvider implements NarrationProvider {
     this.wordsPerMinute = wordsPerMinute;
   }
 
-  public generateId(text: string, _options: NarrationOptions): string {
-    return AudioUtils.generateAudioId(text, ['mock', this.wordsPerMinute.toString()]);
+  public generateId(options: NarrationOptions): string {
+    return AudioUtils.generateAudioId(options.text, ['mock', this.wordsPerMinute.toString()]);
   }
 
   public resolve(
     _narrator: Narrator,
-    text: string,
-    options: NarrationOptions,
+    options: NarrationOptions
   ): Narration {
+    const text = options.text;
     const words = text.split(' ').length;
     const baseDuration = (words / this.wordsPerMinute) * 60; // Convert words per minute to seconds
 
-    const sound = {
-      audio: '', // empty audio for mock
-    };
-
-    const id = this.generateId(text, options);
-    return new Narration(id, text, baseDuration, sound);
+    const id = this.generateId(options);
+    return new Narration(id, text, baseDuration, '');
   }
 }
