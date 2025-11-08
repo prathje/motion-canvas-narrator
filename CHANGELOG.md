@@ -40,8 +40,8 @@ narrator.speak({
     }
 );
 
-// also available when using play()
-narrator.play(narration,
+// also available when using start()
+narrator.start(narration,
     {
         gain: -5.2, // Override default volume for this narration
     }
