@@ -1,8 +1,9 @@
 # Changelog
 
+## [0.0.1] - Initial Release
+Basic functionality.
 
-
-## [0.0.2] - 2025-11-08
+## [0.0.2] - WIP
 
 ### Merged text and NarrationOptions into a single object parameter
 Previous:
@@ -18,12 +19,13 @@ narrator.resolve({ text, ...options });
 
 ### Sound Settings removed from NarrationOptions use NarrationPlaybackOptions instead
 Sound settings are now configured directly on the narrator instance and can be passed to the narrator methods.
+The Narration now only contains the metadata and the audio string.
 They were not configured properly before.
 
 ```ts
 const narrator = createMockNarrator();
 
-// set narrator default sound options
+// set narrator default playback options
 narrator.setDefaultPlaybackOptions({
     volume: 0.8,
     playbackRate: 1.2,
@@ -45,4 +47,7 @@ narrator.play(narration,
     }
 );
 ```
+
+## Added support for Minimax TTS Provider
+Thanks to NeverOccurs for the contribution! See PR [here](https://github.com/prathje/motion-canvas-narrator/pull/3).
 
