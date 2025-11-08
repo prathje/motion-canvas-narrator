@@ -27,7 +27,7 @@ const narrator = createMockNarrator();
 
 // set narrator default playback options
 narrator.setDefaultPlaybackOptions({
-    volume: 0.8,
+    gain: -5.2,
     playbackRate: 1.2,
 });
     
@@ -36,14 +36,14 @@ narrator.speak({
     text: "Hello, world!",
     }, 
     {
-        volume: 0.5, // Override default volume for this narration
+        gain: -5.2, // Override default volume for this narration
     }
 );
 
 // also available when using play()
 narrator.play(narration,
     {
-        volume: 0.5, // Override default volume for this narration
+        gain: -5.2, // Override default volume for this narration
     }
 );
 ```
