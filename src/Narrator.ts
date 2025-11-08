@@ -43,16 +43,20 @@ export class Narrator {
     const narration: Narration = yield this.resolve(text, options);
 
     // and start it
-    yield* this.start(narration);
+    yield* this.start(narration, options);
   }
 
   @threadable()
-  public *start(narration: Narration): ThreadGenerator {
+  public *start(narration: Narration, options: NarrationOptions = {}): ThreadGenerator {
     // Get scene within the generator context
     const scene = useScene();
 
     if (narration.sound.audio) {
       // Add sound, no offset for now
+      // Support both direct options and soundSettings for convenience
+      narration.sound.playbackRate = options?.playbackRate ?? options?.soundSettings?.playbackRate ?? 1;
+      narration.sound.gain = options?.gain ?? options?.soundSettings?.gain ?? 0;
+      narration.sound.detune = options?.detune ?? options?.soundSettings?.detune ?? 0;
       scene.sounds.add(narration.sound, 0);
     } else {
       console.warn(`No audio provided for narration: ${narration.text}`);
