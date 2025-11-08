@@ -54,3 +54,8 @@ Thanks to NeverOccurs for the contribution! See PR [here](https://github.com/pra
 ### Introduced DedupedProvider
 A wrapper provider that deduplicates identical text requests to avoid generating the same audio multiple times when the same text is requested more than once.
 
+## Addition of Narrator.resolveAll method
+This allows resolving multiple narrations in parallel, e.g.:
+```ts
+const narrations = yield narrator.resolveAll(["A", "B", "C"]);
+```

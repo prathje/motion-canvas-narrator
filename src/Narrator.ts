@@ -45,6 +45,12 @@ export class Narrator {
     return this.provider.resolve(this, options);
   }
 
+  public async resolveAll(textOrOptionsList: (string|NarrationOptions)[]): Promise<Narration[]> {
+    return Promise.all(
+      textOrOptionsList.map((textOrOptions: string|NarrationOptions) => this.resolve(textOrOptions))
+    );
+  }
+
   @threadable()
   public *speak(textOrOptions: string|NarrationOptions, playbackOptions: NarrationPlaybackOptions = {}): ThreadGenerator {
     // Await the narration preparation by yielding the promise
