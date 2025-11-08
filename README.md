@@ -106,6 +106,12 @@ Note that the narration seamlessly integrates with Motion Canvas' animation syst
   );
 ```
 
+### 5. Advanced Usage
+You can also customize the narration further by providing additional options such as volume and playback rate:
+```typescript
+    yield* narrator.speak("Hello, world!", { gain: -5.2, playbackRate: 1.2 });
+```
+
 ## Contributing
 
 If you'd like to contribute to this project, please feel free to open issues or pull requests.

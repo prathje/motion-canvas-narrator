@@ -64,13 +64,7 @@ export default makeScene2D(function* (view) {
     playbackRate: 1.2  // Faster
   });
 
-  // Example 5: Narration with offset
-  yield* text().text("Delayed narration...", 0.5);
-  yield* narrator.speak("This narration starts after a 1 second delay.", { 
-    offset: 1
-  });
-
-  // Example 6: Flow control with yield vs yield*
+  // Example 5: Flow control with yield vs yield*
   yield* text().text("Background speech...", 0.5);
   
   // Start background narration (don't wait for completion)
@@ -82,7 +76,7 @@ export default makeScene2D(function* (view) {
     circle().position.y(0, 2)
   );
 
-  // Example 7: Different playback rates
+  // Example 6: Different playback rates
   yield* text().text("Speed variations...", 0.5);
   
   yield* narrator.speak("This is normal speed.", { playbackRate: 1.0 });
