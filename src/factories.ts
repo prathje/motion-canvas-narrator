@@ -6,6 +6,7 @@ import {
 import {FileProvider, FileProviderConfig} from './providers/FileProvider';
 import {MockProvider} from './providers/MockProvider';
 import {CachedProvider} from "./providers/CachedProvider";
+import {DedupedProvider} from "./providers/DedupedProvider";
 import {MinimaxProvider, MinimaxConfig} from "./providers/MinimaxProvider";
 
 // Mock provider factory
@@ -24,7 +25,7 @@ export function createElevenLabsNarrator(
   providerConfig: ElevenLabsConfig,
   narratorConfig: NarratorConfig = {},
 ): Narrator {
-  const provider = new CachedProvider(new ElevenLabsProvider(providerConfig));
+  const provider = new DedupedProvider(new CachedProvider(new ElevenLabsProvider(providerConfig)));
   return new Narrator(provider, narratorConfig);
 }
 
@@ -41,6 +42,6 @@ export function createMinimaxNarrator(
   providerConfig: MinimaxConfig,
   narratorConfig: NarratorConfig = {},
 ): Narrator {
-  const provider = new CachedProvider(new MinimaxProvider(providerConfig));
+  const provider = new DedupedProvider(new CachedProvider(new MinimaxProvider(providerConfig)));
   return new Narrator(provider, narratorConfig);
 }

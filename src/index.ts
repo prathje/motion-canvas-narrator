@@ -18,3 +18,5 @@ export {
 export {FileProvider, FileProviderConfig} from './providers/FileProvider';
 export {MockProvider} from './providers/MockProvider';
 export {MinimaxProvider, MinimaxConfig} from './providers/MinimaxProvider';
+export {CachedProvider} from './providers/CachedProvider';
+export {DedupedProvider} from './providers/DedupedProvider';

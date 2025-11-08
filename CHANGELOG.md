@@ -48,6 +48,9 @@ narrator.play(narration,
 );
 ```
 
-## Added support for Minimax TTS Provider
+### Added support for Minimax TTS Provider
 Thanks to NeverOccurs for the contribution! See PR [here](https://github.com/prathje/motion-canvas-narrator/pull/3).
+
+### Introduced DedupedProvider
+A wrapper provider that deduplicates identical text requests to avoid generating the same audio multiple times when the same text is requested more than once.
 
