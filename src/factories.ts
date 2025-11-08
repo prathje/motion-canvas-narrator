@@ -6,6 +6,7 @@ import {
 import {FileProvider, FileProviderConfig} from './providers/FileProvider';
 import {MockProvider} from './providers/MockProvider';
 import {CachedProvider} from "./providers/CachedProvider";
+import {MinimaxProvider, MinimaxConfig} from "./providers/Minimax";
 
 // Mock provider factory
 export function createMockNarrator(
@@ -33,5 +34,13 @@ export function createFileNarrator(
   narratorConfig: NarratorConfig = {},
 ): Narrator {
   const provider = new FileProvider(providerConfig);
+  return new Narrator(provider, narratorConfig);
+}
+
+export function createMinimaxNarrator(
+  providerConfig: MinimaxConfig,
+  narratorConfig: NarratorConfig = {},
+): Narrator {
+  const provider = new CachedProvider(new MinimaxProvider(providerConfig));
   return new Narrator(provider, narratorConfig);
 }
