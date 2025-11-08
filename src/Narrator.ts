@@ -56,14 +56,13 @@ export class Narrator {
   }
 
   @threadable()
-  public *start(narration: Narration, playbackOptions: NarrationPlaybackOptions|null = null): ThreadGenerator {
+  public *start(narration: Narration, playbackOptions: NarrationPlaybackOptions = {}): ThreadGenerator {
     // Get scene within the generator context
     const scene = useScene();
 
     if (narration.audio) {
-      if (playbackOptions === null) {
-        playbackOptions = this.defaultPlaybackOptions; // use narrator's default playback options if none provided
-      }
+
+      playbackOptions = {...this.defaultPlaybackOptions, ...playbackOptions}; // use narrator's default playback options if none provided
 
       const sound = {
         audio: narration.audio,
