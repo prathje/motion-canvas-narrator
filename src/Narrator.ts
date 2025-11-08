@@ -47,7 +47,6 @@ export class Narrator {
 
   @threadable()
   public *speak(textOrOptions: string|NarrationOptions, playbackOptions: NarrationPlaybackOptions = {}): ThreadGenerator {
-
     // Await the narration preparation by yielding the promise
     const narration: Narration = yield this.resolve(textOrOptions);
 
@@ -60,23 +59,24 @@ export class Narrator {
     // Get scene within the generator context
     const scene = useScene();
 
-    if (narration.audio) {
+    playbackOptions = {...this.defaultPlaybackOptions, ...playbackOptions}; // use narrator's default playback options if none provided
 
-      playbackOptions = {...this.defaultPlaybackOptions, ...playbackOptions}; // use narrator's default playback options if none provided
+    const sound = {
+      audio: narration.audio,
+      playbackRate: playbackOptions.playbackRate ?? 1,
+      gain: playbackOptions.gain ?? 0,
+      detune: playbackOptions.detune ?? 0,
+    };
 
-      const sound = {
-        audio: narration.audio,
-        playbackRate: playbackOptions.playbackRate ?? 1,
-        gain: playbackOptions.gain ?? 0,
-        detune: playbackOptions.detune ?? 0,
-      };
+    const adjustedDuration= narration.duration / sound.playbackRate;
 
+    if (sound.audio) {
       scene.sounds.add(sound, 0);
     } else {
       console.warn(`No audio provided for narration: ${narration.text}`);
     }
 
     // Wait for the narration to complete
-    yield* waitFor(narration.duration);
+    yield* waitFor(adjustedDuration);
   }
 }
