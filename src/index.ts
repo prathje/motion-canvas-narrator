@@ -17,4 +17,4 @@ export {
 } from './providers/ElevenLabsProvider';
 export {FileProvider, FileProviderConfig} from './providers/FileProvider';
 export {MockProvider} from './providers/MockProvider';
-export {MinimaxProvider, MinimaxConfig} from './providers/Minimax';
+export {MinimaxProvider, MinimaxConfig} from './providers/MinimaxProvider';

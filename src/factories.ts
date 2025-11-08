@@ -6,7 +6,7 @@ import {
 import {FileProvider, FileProviderConfig} from './providers/FileProvider';
 import {MockProvider} from './providers/MockProvider';
 import {CachedProvider} from "./providers/CachedProvider";
-import {MinimaxProvider, MinimaxConfig} from "./providers/Minimax";
+import {MinimaxProvider, MinimaxConfig} from "./providers/MinimaxProvider";
 
 // Mock provider factory
 export function createMockNarrator(
