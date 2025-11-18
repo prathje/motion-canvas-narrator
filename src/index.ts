@@ -1,5 +1,6 @@
 export {
   createElevenLabsNarrator,
+  createElevenLabsSoundNarrator,
   createFileNarrator,
   createMockNarrator,
   createMinimaxNarrator
@@ -15,6 +16,10 @@ export {
   ElevenLabsConfig,
   ElevenLabsProvider,
 } from './providers/ElevenLabsProvider';
+export {
+  ElevenLabsSoundConfig,
+  ElevenLabsSoundProvider,
+} from './providers/ElevenLabsSoundProvider';
 export {FileProvider, FileProviderConfig} from './providers/FileProvider';
 export {MockProvider} from './providers/MockProvider';
 export {MinimaxProvider, MinimaxConfig} from './providers/MinimaxProvider';

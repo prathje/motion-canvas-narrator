@@ -36,8 +36,8 @@ export class ElevenLabsSoundProvider implements NarrationProvider {
     }
   }
 
-  public generateId(text: string, _options: NarrationOptions): string {
-    return AudioUtils.generateAudioId(text, [
+  public generateId(options: NarrationOptions): string {
+    return AudioUtils.generateAudioId(options.text, [
       this.config.modelId!,
       String(this.config.loop),
       String(this.config.durationSeconds ?? 'auto'),
@@ -47,12 +47,11 @@ export class ElevenLabsSoundProvider implements NarrationProvider {
   }
 
   public async resolve(
-    _narrator: Narrator,
-    text: string,
+    narrator: Narrator,
     options: NarrationOptions,
   ): Promise<Narration> {
     console.log(
-      `Fetching sound effect from ElevenLabs API for: "${text.substring(
+      `Fetching sound effect from ElevenLabs API for: "${options.text.substring(
         0,
         50,
       )}..."`,
@@ -84,7 +83,7 @@ export class ElevenLabsSoundProvider implements NarrationProvider {
 
       // Use textToSoundEffects instead of textToSpeech
       const audioStream = await elevenlabs.textToSoundEffects.convert({
-        text: text,
+        text: options.text,
         model_id: this.config.modelId!,
         loop: this.config.loop,
         duration_seconds: this.config.durationSeconds,
@@ -105,23 +104,20 @@ export class ElevenLabsSoundProvider implements NarrationProvider {
         audio: audioUrl,
       };
 
-      const id = this.generateId(text, options);
+      const id = this.generateId(options);
 
       console.log(`Sound effect with duration ${duration} generated`);
-      return new Narration(id, text, duration, sound);
+      return new Narration(id, options.text, duration, audioUrl);
     } catch (error) {
       console.error('ElevenLabs Sound Effects API error:', error);
       // For sound effects, estimate duration based on config or default
       const duration =
         this.config.durationSeconds ??
-        Math.max(0.5, text.split(' ').length / 5);
+        Math.max(0.5, options.text.split(' ').length / 5);
 
-      const sound = {
-        audio: '',
-      };
-      const id = this.generateId(text, options);
+      const id = this.generateId(options);
 
-      return new Narration(id, text, duration, sound);
+      return new Narration(id, options.text, duration, "");
     }
   }
 }
