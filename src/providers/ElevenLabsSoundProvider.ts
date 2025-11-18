@@ -1,0 +1,127 @@
+import {Narration} from '../Narration';
+import {NarrationOptions, NarrationProvider, Narrator} from '../Narrator';
+import {AudioUtils} from '../utils/AudioUtils';
+
+export interface ElevenLabsSoundConfig {
+  apiKey?: string;
+  modelId?: string;
+  loop?: boolean;
+  durationSeconds?: number | null;
+  promptInfluence?: number | null;
+  outputFormat?: string;
+}
+
+export class ElevenLabsSoundProvider implements NarrationProvider {
+  public name = 'ElevenLabs Sound Effects';
+  private config: Required<Pick<ElevenLabsSoundConfig, 'apiKey'>> &
+    Omit<ElevenLabsSoundConfig, 'apiKey'>;
+
+  public constructor(config: ElevenLabsSoundConfig) {
+    const apiKey = config.apiKey || (process.env.ELEVENLABS_API_KEY as string | undefined);
+    
+    this.config = {
+      ...config,
+      apiKey: apiKey!,
+      modelId: config.modelId || 'eleven_text_to_sound_v2',
+      loop: config.loop ?? false,
+      durationSeconds: config.durationSeconds ?? null,
+      promptInfluence: config.promptInfluence ?? 0.3,
+      outputFormat: config.outputFormat || 'mp3_44100_128',
+    };
+
+    if (!this.config.apiKey) {
+      throw new Error(
+        'ElevenLabs API key is required. Provide it via config.apiKey or set ELEVENLABS_API_KEY environment variable.',
+      );
+    }
+  }
+
+  public generateId(text: string, _options: NarrationOptions): string {
+    return AudioUtils.generateAudioId(text, [
+      this.config.modelId!,
+      String(this.config.loop),
+      String(this.config.durationSeconds ?? 'auto'),
+      String(this.config.promptInfluence),
+      this.config.outputFormat!,
+    ]);
+  }
+
+  public async resolve(
+    _narrator: Narrator,
+    text: string,
+    options: NarrationOptions,
+  ): Promise<Narration> {
+    console.log(
+      `Fetching sound effect from ElevenLabs API for: "${text.substring(
+        0,
+        50,
+      )}..."`,
+    );
+
+    try {
+      // Dynamic import to avoid bundling issues
+      let ElevenLabsModule: any;
+      let ElevenLabsClient: any;
+
+      try {
+        ElevenLabsModule = (await import('@elevenlabs/elevenlabs-js')) as any;
+        ElevenLabsClient = ElevenLabsModule.ElevenLabsClient;
+      } catch (importError) {
+        throw new Error(
+          'ElevenLabs package not installed. Install it with: npm install @elevenlabs/elevenlabs-js',
+        );
+      }
+
+      if (!ElevenLabsClient) {
+        throw new Error(
+          'ElevenLabsClient not found in module exports. Please check your @elevenlabs/elevenlabs-js installation.',
+        );
+      }
+
+      const elevenlabs = new ElevenLabsClient({
+        apiKey: this.config.apiKey!,
+      });
+
+      // Use textToSoundEffects instead of textToSpeech
+      const audioStream = await elevenlabs.textToSoundEffects.convert({
+        text: text,
+        model_id: this.config.modelId!,
+        loop: this.config.loop,
+        duration_seconds: this.config.durationSeconds,
+        prompt_influence: this.config.promptInfluence,
+        output_format: this.config.outputFormat,
+      });
+
+      // Convert ReadableStream to ArrayBuffer
+      const audioBuffer = await AudioUtils.streamToArrayBuffer(audioStream);
+
+      const audioBlob = new Blob([audioBuffer], {type: 'audio/mpeg'});
+      const duration = await AudioUtils.getAudioDuration(audioBlob);
+
+      // Create blob URL for audio
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const sound = {
+        audio: audioUrl,
+      };
+
+      const id = this.generateId(text, options);
+
+      console.log(`Sound effect with duration ${duration} generated`);
+      return new Narration(id, text, duration, sound);
+    } catch (error) {
+      console.error('ElevenLabs Sound Effects API error:', error);
+      // For sound effects, estimate duration based on config or default
+      const duration =
+        this.config.durationSeconds ??
+        Math.max(0.5, text.split(' ').length / 5);
+
+      const sound = {
+        audio: '',
+      };
+      const id = this.generateId(text, options);
+
+      return new Narration(id, text, duration, sound);
+    }
+  }
+}
