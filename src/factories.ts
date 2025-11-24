@@ -3,6 +3,10 @@ import {
   ElevenLabsConfig,
   ElevenLabsProvider,
 } from './providers/ElevenLabsProvider';
+import {
+  ElevenLabsSoundConfig,
+  ElevenLabsSoundProvider,
+} from './providers/ElevenLabsSoundProvider';
 import {FileProvider, FileProviderConfig} from './providers/FileProvider';
 import {MockProvider} from './providers/MockProvider';
 import {CachedProvider} from "./providers/CachedProvider";
@@ -43,5 +47,14 @@ export function createMinimaxNarrator(
   narratorConfig: NarratorConfig = {},
 ): Narrator {
   const provider = new DedupedProvider(new CachedProvider(new MinimaxProvider(providerConfig)));
+  return new Narrator(provider, narratorConfig);
+}
+
+// ElevenLabs Sound Effects provider factory
+export function createElevenLabsSoundNarrator(
+  providerConfig: ElevenLabsSoundConfig,
+  narratorConfig: NarratorConfig = {},
+): Narrator {
+  const provider = new DedupedProvider(new CachedProvider(new ElevenLabsSoundProvider(providerConfig)));
   return new Narrator(provider, narratorConfig);
 }
