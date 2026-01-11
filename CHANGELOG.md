@@ -1,9 +1,9 @@
 # Changelog
 
-## [0.0.1] - Initial Release
+## [0.1.0] - Initial Release
 Basic functionality.
 
-## [0.0.2] - WIP
+## [0.2.0]
 
 ### Merged text and NarrationOptions into a single object parameter
 Previous:
@@ -81,3 +81,6 @@ This allows resolving multiple narrations in parallel, e.g.:
 ```ts
 const narrations = yield narrator.resolveAll(["A", "B", "C"]);
 ```
+
+
+## [0.3.0] WIP
