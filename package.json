@@ -40,7 +40,7 @@
     "dist/**/*"
   ],
   "dependencies": {
-    "motion-canvas-cache": "github:prathje/motion-canvas-cache",
+    "motion-canvas-cache": "^0.1.0",
     "path-browserify": "^1.0.1",
     "tsc-alias": "^1.8.16"
   },
