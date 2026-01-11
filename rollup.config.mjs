@@ -33,34 +33,5 @@ export default [
                 }
             })
         ],
-    },
-    {
-        input: 'src/vite-plugin/plugin.ts',
-        output: {
-            file: 'dist/vite-plugin.js',
-            format: 'es',
-            sourcemap: true,
-        },
-        external: [
-            'fs',
-            'path',
-            'vite'
-        ],
-        plugins: [
-            resolve({
-                preferBuiltins: false,
-                browser: true,
-                exportConditions: ['import', 'module', 'default']
-            }), 
-            json(), 
-            commonjs(), 
-            typescript({
-                compilerOptions: {
-                    experimentalDecorators: true,
-                    emitDecoratorMetadata: false,
-                    useDefineForClassFields: false
-                }
-            })
-        ],
-    },
+    }
 ];
