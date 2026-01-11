@@ -98,16 +98,6 @@ const narrator = createElevenLabsNarrator({
 });
 ```
 
-#### Using Google Vertex AI (requires `@google-cloud/vertexai`):
-```typescript
-import { createVertexAINarrator } from 'motion-canvas-narrator';
-const narrator = createVertexAINarrator({
-    projectId: 'your-google-cloud-project',
-    voiceName: 'Puck', // Options: Kore, Puck, Charon, Aoede
-    instruction: 'Speak naturally' // Optional voice instruction
-});
-```
-
 #### Using Minimax:
 ```typescript
 import { createMinimaxNarrator } from 'motion-canvas-narrator';
