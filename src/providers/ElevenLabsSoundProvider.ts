@@ -65,7 +65,7 @@ export class ElevenLabsSoundProvider implements NarrationProvider {
 
       try {
         ElevenLabsModule = (await import('@elevenlabs/elevenlabs-js')) as any;
-        ElevenLabsClient = ElevenLabsModule.ElevenLabsClient;
+        ElevenLabsClient = ElevenLabsModule.ElevenLabsClient || ElevenLabsModule.default?.ElevenLabsClient;
       } catch (importError) {
         throw new Error(
           'ElevenLabs package not installed. Install it with: npm install @elevenlabs/elevenlabs-js',
