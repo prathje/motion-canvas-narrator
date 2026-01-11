@@ -1,21 +1,19 @@
 import { Narration } from '../Narration';
-import { AudioUtils } from '../utils/AudioUtils';
+import { CacheUtils } from 'motion-canvas-cache';
 export class MockProvider {
     constructor(wordsPerMinute = 120) {
         this.name = 'Mock Provider';
         this.wordsPerMinute = wordsPerMinute;
     }
-    generateId(text, _options) {
-        return AudioUtils.generateAudioId(text, ['mock', this.wordsPerMinute.toString()]);
+    generateId(options) {
+        return CacheUtils.generateCacheKey(options.text, ['mock', this.wordsPerMinute.toString()]);
     }
-    resolve(_narrator, text, options) {
+    resolve(_narrator, options) {
+        const text = options.text;
         const words = text.split(' ').length;
         const baseDuration = (words / this.wordsPerMinute) * 60; // Convert words per minute to seconds
-        const sound = {
-            audio: '', // empty audio for mock
-        };
-        const id = this.generateId(text, options);
-        return new Narration(id, text, baseDuration, sound);
+        const id = this.generateId(options);
+        return new Narration(id, text, baseDuration, '');
     }
 }
 //# sourceMappingURL=MockProvider.js.map

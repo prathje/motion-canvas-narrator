@@ -1,6 +1,7 @@
 import {Narration} from '../Narration';
 import {NarrationOptions, NarrationProvider, Narrator} from '../Narrator';
 import {AudioUtils} from '../utils/AudioUtils';
+import {CacheUtils} from 'motion-canvas-cache';
 
 export interface ElevenLabsSoundConfig {
   apiKey?: string;
@@ -37,7 +38,7 @@ export class ElevenLabsSoundProvider implements NarrationProvider {
   }
 
   public generateId(options: NarrationOptions): string {
-    return AudioUtils.generateAudioId(options.text, [
+    return CacheUtils.generateCacheKey(options.text, [
       this.config.modelId!,
       String(this.config.loop),
       String(this.config.durationSeconds ?? 'auto'),
@@ -92,7 +93,7 @@ export class ElevenLabsSoundProvider implements NarrationProvider {
       });
 
       // Convert ReadableStream to ArrayBuffer
-      const audioBuffer = await AudioUtils.streamToArrayBuffer(audioStream);
+      const audioBuffer = await CacheUtils.streamToArrayBuffer(audioStream);
 
       const audioBlob = new Blob([audioBuffer], {type: 'audio/mpeg'});
       const duration = await AudioUtils.getAudioDuration(audioBlob);

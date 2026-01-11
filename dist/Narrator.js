@@ -7,30 +7,45 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { useScene, waitFor, threadable } from '@motion-canvas/core';
 export class Narrator {
     constructor(provider, config = {}) {
+        this.defaultPlaybackOptions = {}; // default playback options
         this.provider = provider;
         this.config = config;
     }
-    async resolve(text, options = {}) {
-        return await this.provider.resolve(this, text, options);
+    setDefaultPlaybackOptions(options) {
+        this.defaultPlaybackOptions = options;
     }
-    *speak(text, options = {}) {
-        // Await the narration preparation
-        const narration = yield this.resolve(text, options);
+    async resolve(textOrOptions) {
+        const options = typeof textOrOptions === 'string' ? { text: textOrOptions } : textOrOptions;
+        return this.provider.resolve(this, options);
+    }
+    async resolveAll(textOrOptionsList) {
+        return Promise.all(textOrOptionsList.map((textOrOptions) => this.resolve(textOrOptions)));
+    }
+    *speak(textOrOptions, playbackOptions = {}) {
+        // Await the narration preparation by yielding the promise
+        const narration = yield this.resolve(textOrOptions);
         // and start it
-        yield* this.start(narration);
+        yield* this.start(narration, playbackOptions);
     }
-    *start(narration) {
+    *start(narration, playbackOptions = {}) {
         // Get scene within the generator context
         const scene = useScene();
-        if (narration.sound.audio) {
-            // Add sound, no offset for now
-            scene.sounds.add(narration.sound, 0);
+        playbackOptions = { ...this.defaultPlaybackOptions, ...playbackOptions }; // use narrator's default playback options if none provided
+        const sound = {
+            audio: narration.audio,
+            playbackRate: playbackOptions.playbackRate ?? 1,
+            gain: playbackOptions.gain ?? 0,
+            detune: playbackOptions.detune ?? 0,
+        };
+        const adjustedDuration = narration.duration / sound.playbackRate;
+        if (sound.audio) {
+            scene.sounds.add(sound, 0);
         }
         else {
             console.warn(`No audio provided for narration: ${narration.text}`);
         }
         // Wait for the narration to complete
-        yield* waitFor(narration.duration);
+        yield* waitFor(adjustedDuration);
     }
 }
 __decorate([

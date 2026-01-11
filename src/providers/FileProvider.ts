@@ -1,6 +1,7 @@
 import {Narration} from '../Narration';
 import {NarrationOptions, NarrationProvider, Narrator} from '../Narrator';
 import {AudioUtils} from '../utils/AudioUtils';
+import {CacheUtils} from 'motion-canvas-cache';
 
 export interface FileProviderConfig {
   audioDirectory?: string;
@@ -16,7 +17,7 @@ export class FileProvider implements NarrationProvider {
 
   public generateId(options: NarrationOptions): string {
     const audioDirectory = this.config.audioDirectory || 'default';
-    return AudioUtils.generateAudioId(options.text, ['file', audioDirectory]);
+    return CacheUtils.generateCacheKey(options.text, ['file', audioDirectory]);
   }
 
   public async resolve(

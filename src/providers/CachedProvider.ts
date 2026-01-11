@@ -1,16 +1,16 @@
 import {Narration} from '../Narration';
 import {NarrationOptions, NarrationProvider, Narrator} from '../Narrator';
-import {AudioCache} from '../utils/AudioCache';
+import {Cache} from 'motion-canvas-cache';
 
 export class CachedProvider implements NarrationProvider {
   public name: string;
   private innerProvider: NarrationProvider;
-  private audioCache: AudioCache;
+  private cache: Cache;
 
   public constructor(innerProvider: NarrationProvider) {
     this.innerProvider = innerProvider;
     this.name = `Cached ${innerProvider.name}`;
-    this.audioCache = AudioCache.getInstance();
+    this.cache = Cache.getInstance();
   }
 
   public generateId(options: NarrationOptions): string {
@@ -26,11 +26,11 @@ export class CachedProvider implements NarrationProvider {
     const cacheKey = this.generateId(options);
 
     // First check in-memory cache
-    let cachedResult = this.audioCache.get(cacheKey);
+    let cachedResult = this.cache.get(cacheKey);
 
     // If not in memory, check server cache
     if (!cachedResult) {
-      cachedResult = await this.audioCache.checkServerCache(cacheKey);
+      cachedResult = await this.cache.checkServerCache(cacheKey);
     }
 
     // If still not found, delegate to inner provider
@@ -48,7 +48,8 @@ export class CachedProvider implements NarrationProvider {
             const audioBuffer = await response.arrayBuffer();
 
             // Upload to server cache
-            await this.audioCache.uploadToServer(cacheKey, audioBuffer, narration.duration, {
+            await this.cache.uploadToServer(cacheKey, audioBuffer, 'audio/mpeg', {
+              duration: narration.duration,
               generatedAt: new Date().toISOString()
             });
           } catch (error) {
@@ -57,7 +58,9 @@ export class CachedProvider implements NarrationProvider {
         }
 
         // Cache in memory
-        this.audioCache.cacheAudioResult(cacheKey, narration.audio, narration.duration);
+        this.cache.cacheResult(cacheKey, narration.audio, {
+          duration: narration.duration
+        });
       }
 
       return narration;
@@ -65,7 +68,7 @@ export class CachedProvider implements NarrationProvider {
       console.log(`Cache hit for "${text.substring(0, 50)}..."`);
 
       const id = this.generateId(options);
-      return new Narration(id, options.text, cachedResult.duration, cachedResult.audioUrl);
+      return new Narration(id, options.text, cachedResult.metadata?.duration || 0, cachedResult.url);
     }
   }
 }

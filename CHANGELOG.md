@@ -54,6 +54,28 @@ Thanks to NeverOccurs for the contribution! See PR [here](https://github.com/pra
 ### Introduced DedupedProvider
 A wrapper provider that deduplicates identical text requests to avoid generating the same audio multiple times when the same text is requested more than once.
 
+### Migrated to motion-canvas-cache package
+The AudioCache and ViteCachePlugin have been replaced with the generic `motion-canvas-cache` package. This provides a cleaner separation of concerns:
+
+**Breaking Changes:**
+- **Vite Plugin**: Import `motionCanvasCachePlugin` directly from `motion-canvas-cache` instead of the old `motionCanvasNarratorPlugin`
+- **AudioUtils**: The following methods have been moved to `CacheUtils` from `motion-canvas-cache`:
+  - `AudioUtils.generateAudioId()` → `CacheUtils.generateCacheKey()`
+  - `AudioUtils.streamToArrayBuffer()` → `CacheUtils.streamToArrayBuffer()`
+  - `AudioUtils.blobToDataUrl()` → `CacheUtils.blobToDataUrl()`
+- **AudioUtils** now only contains audio-specific methods: `getAudioDuration()` and its helpers
+
+**Migration Guide:**
+```ts
+// Before
+import { motionCanvasNarratorPlugin } from 'motion-canvas-narrator/vite-plugin';
+
+// After
+import { motionCanvasCachePlugin } from 'motion-canvas-cache/vite-plugin';
+```
+
+The cache directory now defaults to `motion-canvas-cache` instead of `narrator-cache`.
+
 ## Addition of Narrator.resolveAll method
 This allows resolving multiple narrations in parallel, e.g.:
 ```ts

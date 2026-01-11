@@ -1,33 +1,5 @@
 export class AudioUtils {
     /**
-     * Converts a ReadableStream to ArrayBuffer
-     */
-    static async streamToArrayBuffer(stream) {
-        const reader = stream.getReader();
-        const chunks = [];
-        let totalLength = 0;
-        try {
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done)
-                    break;
-                chunks.push(value);
-                totalLength += value.length;
-            }
-        }
-        finally {
-            reader.releaseLock();
-        }
-        // Combine all chunks into a single ArrayBuffer
-        const result = new Uint8Array(totalLength);
-        let offset = 0;
-        for (const chunk of chunks) {
-            result.set(chunk, offset);
-            offset += chunk.length;
-        }
-        return result.buffer;
-    }
-    /**
      * Gets the duration of an audio blob using multiple fallback methods
      */
     static async getAudioDuration(audioBlob) {
@@ -97,37 +69,6 @@ export class AudioUtils {
         // Average MP3 bitrate is ~128kbps = 16KB/s
         const estimatedSeconds = audioBlob.size / (16 * 1024);
         return Math.max(0.1, estimatedSeconds); // Minimum 0.1 seconds
-    }
-    /**
-     * Converts a Blob to a data URL
-     */
-    static blobToDataUrl(blob) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    }
-    /**
-     * Generates an audio ID from text and options
-     */
-    static generateAudioId(text, opts) {
-        const content = `${text}-${opts.join('-')}`;
-        return AudioUtils.simpleHash(content);
-    }
-    /**
-     * Simple hash function for generating cache keys
-     */
-    static simpleHash(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = (hash << 5) - hash + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        // Convert to hex and ensure exactly 8 characters by padding with zeros or truncating
-        return Math.abs(hash).toString(16).padStart(8, '0').slice(0, 8);
     }
 }
 //# sourceMappingURL=AudioUtils.js.map

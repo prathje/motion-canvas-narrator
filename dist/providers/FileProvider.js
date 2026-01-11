@@ -1,24 +1,23 @@
 import { Narration } from '../Narration';
 import { AudioUtils } from '../utils/AudioUtils';
+import { CacheUtils } from 'motion-canvas-cache';
 export class FileProvider {
     constructor(config = {}) {
         this.name = 'File Provider';
         this.config = config;
     }
-    generateId(text, _options) {
+    generateId(options) {
         const audioDirectory = this.config.audioDirectory || 'default';
-        return AudioUtils.generateAudioId(text, ['file', audioDirectory]);
+        return CacheUtils.generateCacheKey(options.text, ['file', audioDirectory]);
     }
-    async resolve(_narrator, text, options) {
+    async resolve(_narrator, options) {
+        const text = options.text;
         // For FileProvider, the "text" parameter should be the file path
         const audioUrl = this.resolveAudioPath(text);
-        const sound = {
-            audio: audioUrl,
-        };
         // Get actual audio duration
         const duration = await this.getAudioDuration(audioUrl);
-        const id = this.generateId(text, options);
-        return new Narration(id, text, duration, sound);
+        const id = this.generateId(options);
+        return new Narration(id, text, duration, audioUrl);
     }
     resolveAudioPath(filePath) {
         if (this.isAbsoluteUrl(filePath)) {

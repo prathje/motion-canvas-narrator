@@ -1,11 +1,14 @@
 import { Narration } from '../Narration';
 import { NarrationOptions, NarrationProvider, Narrator } from '../Narrator';
-export declare class CachedProvider implements NarrationProvider {
+/**
+ * A provider wrapper that deduplicates simultaneous requests for the same cache key.
+ */
+export declare class DedupedProvider implements NarrationProvider {
     name: string;
     private innerProvider;
-    private cache;
+    private pendingRequests;
     constructor(innerProvider: NarrationProvider);
     generateId(options: NarrationOptions): string;
     resolve(narrator: Narrator, options: NarrationOptions): Promise<Narration>;
 }
-//# sourceMappingURL=CachedProvider.d.ts.map
+//# sourceMappingURL=DedupedProvider.d.ts.map

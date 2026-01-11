@@ -1,6 +1,6 @@
 import {Narration} from '../Narration';
 import {NarrationOptions, NarrationProvider, Narrator} from '../Narrator';
-import {AudioUtils} from '../utils/AudioUtils';
+import {CacheUtils} from 'motion-canvas-cache';
 
 export class MockProvider implements NarrationProvider {
   public name = 'Mock Provider';
@@ -11,7 +11,7 @@ export class MockProvider implements NarrationProvider {
   }
 
   public generateId(options: NarrationOptions): string {
-    return AudioUtils.generateAudioId(options.text, ['mock', this.wordsPerMinute.toString()]);
+    return CacheUtils.generateCacheKey(options.text, ['mock', this.wordsPerMinute.toString()]);
   }
 
   public resolve(

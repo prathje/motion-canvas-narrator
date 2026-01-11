@@ -9,7 +9,7 @@ export declare class ElevenLabsProvider implements NarrationProvider {
     name: string;
     private config;
     constructor(config: ElevenLabsConfig);
-    generateId(text: string, _options: NarrationOptions): string;
-    resolve(_narrator: Narrator, text: string, options: NarrationOptions): Promise<Narration>;
+    generateId(options: NarrationOptions): string;
+    resolve(_narrator: Narrator, options: NarrationOptions): Promise<Narration>;
 }
 //# sourceMappingURL=ElevenLabsProvider.d.ts.map

@@ -1,5 +1,6 @@
 import { Narration } from '../Narration';
 import { AudioUtils } from '../utils/AudioUtils';
+import { CacheUtils } from 'motion-canvas-cache';
 export class ElevenLabsProvider {
     constructor(config) {
         this.name = 'ElevenLabs TTS';
@@ -12,10 +13,11 @@ export class ElevenLabsProvider {
             throw new Error('ElevenLabs API key is required. Provide it via config.apiKey or set ELEVENLABS_API_KEY environment variable.');
         }
     }
-    generateId(text, _options) {
-        return AudioUtils.generateAudioId(text, [this.config.voiceId, this.config.modelId]);
+    generateId(options) {
+        return CacheUtils.generateCacheKey(options.text, [this.config.voiceId, this.config.modelId]);
     }
-    async resolve(_narrator, text, options) {
+    async resolve(_narrator, options) {
+        const text = options.text;
         console.log(`Fetching audio from ElevenLabs API for: "${text.substring(0, 50)}..."`);
         try {
             // Dynamic import to avoid bundling issues
@@ -40,26 +42,20 @@ export class ElevenLabsProvider {
                 modelId: this.config.modelId,
             });
             // Convert ReadableStream to ArrayBuffer
-            const audioBuffer = await AudioUtils.streamToArrayBuffer(audioStream);
+            const audioBuffer = await CacheUtils.streamToArrayBuffer(audioStream);
             const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
             const duration = await AudioUtils.getAudioDuration(audioBlob);
             // Create blob URL for audio
             const audioUrl = URL.createObjectURL(audioBlob);
-            const sound = {
-                audio: audioUrl,
-            };
-            const id = this.generateId(text, options);
+            const id = this.generateId(options);
             console.log(`Audio with duration ${duration} generated`);
-            return new Narration(id, text, duration, sound);
+            return new Narration(id, text, duration, audioUrl);
         }
         catch (error) {
             console.error('ElevenLabs API error:', error);
             const duration = text.split(' ').length / 2.5;
-            const sound = {
-                audio: '',
-            };
-            const id = this.generateId(text, options);
-            return new Narration(id, text, duration, sound);
+            const id = this.generateId(options);
+            return new Narration(id, text, duration, '');
         }
     }
 }

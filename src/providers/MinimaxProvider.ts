@@ -1,6 +1,7 @@
 import {Narration} from '../Narration';
 import {NarrationOptions, NarrationProvider, Narrator} from '../Narrator';
 import {AudioUtils} from '../utils/AudioUtils';
+import {CacheUtils} from 'motion-canvas-cache';
 
 export interface MinimaxConfig {
   apiKey?: string;
@@ -58,7 +59,7 @@ export class MinimaxProvider implements NarrationProvider {
   }
 
   public generateId(options: NarrationOptions): string {
-    return AudioUtils.generateAudioId(options.text, [
+    return CacheUtils.generateCacheKey(options.text, [
       this.config.voiceId,
       this.config.model ?? 'speech-2.6-turbo',
       this.config.format ?? 'mp3',
