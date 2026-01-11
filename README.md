@@ -54,7 +54,7 @@ You can also check out the example project that includes subtitles used for the 
 ### 1. Install the Package
 
 ```bash
-npm install https://github.com/prathje/motion-canvas-narrator.git
+npm install motion-canvas-narrator
 ```
 
 ### 2. Enable the Cache Plugin in your *vite.config.ts*
