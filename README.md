@@ -22,12 +22,14 @@ The source code is available here: [Example Project](https://github.com/prathje/
 
 ## Provider Support
 
-| **Provider**	      | **TTS** 	  |  **Voice Cloning** 	  |  **Fine Grained Timestamps** 	  | **Remarks**      |
-|--------------------|:----------:|:---------------------:|:-------------------------------:|------------------|
-| **ElevenLabs** 	   |    ✅ 	     |           	           |                	                | Requires Account |
-| **Open AI**    	   |     	      |           	           |                	                | Missing          |
-| **Google TTS** 	   |     	      |           	           |                	                | Missing          |
-| **speechify**  	   |     	      |           	           |                	                | Missing        |
+| **Provider**	         | **TTS** 	 |  **Voice Cloning** 	  |  **Fine Grained Timestamps** 	  | **Remarks**                         |
+|-----------------------|:---------:|:---------------------:|:-------------------------------:|-------------------------------------|
+| **ElevenLabs TTS** 	  |    ✅ 	    |          ✅ 	          |                	                | Requires Account                    |
+| **ElevenLabs Sound**  |    ✅ 	    |                       |                	                | Sound effects, Requires Account     |
+| **Google Vertex AI**  |   wip 	   |                       |                	                | Requires Google Cloud Project       |
+| **Minimax**    	      |    ✅ 	    |                       |                	                | Requires Account                    |
+| **File Provider**     |    ✅ 	    |          N/A          |                	                | Load from local files               |
+| **Mock Provider**     |    ✅ 	    |          N/A          |                	                | For testing/planning (no audio)     |
 
 
 Other potential providers:
@@ -55,39 +57,71 @@ You can also check out the example project that includes subtitles used for the 
 npm install https://github.com/prathje/motion-canvas-narrator.git
 ```
 
-### 2. Enable the Narrator Plugin in your *vite.config.ts*
+### 2. Enable the Cache Plugin in your *vite.config.ts*
 This plugin is responsible for caching audio files on the server, so you don't have to re-generate them every time you run your project.
-You only need to add the plugin to your `vite.config.ts` file:
 
+First, install the cache plugin package:
+```bash
+npm install motion-canvas-cache
+```
 
+Then add the plugin to your `vite.config.ts` file:
 
 ```typescript
 import {defineConfig} from 'vite';
 import motionCanvas from '@motion-canvas/vite-plugin';
 import ffmpeg from '@motion-canvas/ffmpeg';
 
-import { motionCanvasNarratorPlugin } from 'motion-canvas-narrator/vite-plugin';
+import { motionCanvasCachePlugin } from 'motion-canvas-cache/vite-plugin';
 
 export default defineConfig({
   plugins: [
     motionCanvas(),
     ffmpeg(), // make sure that you setup ffmpeg to export audio as well
-    // Add the narrator plugin for server-side audio caching:
-    motionCanvasNarratorPlugin(),
+    // Add the cache plugin for server-side audio caching:
+    motionCanvasCachePlugin(),
   ]
 });
 ```
 
 
-### 3. Create a Narrator (e.g., using ElevenLabs)
+### 3. Create a Narrator
 The narrator serves as the primary interface for generating audio from text.
 
+#### Using ElevenLabs TTS:
 ```typescript
 import { createElevenLabsNarrator } from 'motion-canvas-narrator';
 const narrator = createElevenLabsNarrator({
     modelId: 'eleven_v3',
     voiceId: 'JBFqnCBsd6RMkjVDRZzb',
     apiKey: '<YOUR_ELEVENLABS_API_KEY>'
+});
+```
+
+#### Using Google Vertex AI (requires `@google-cloud/vertexai`):
+```typescript
+import { createVertexAINarrator } from 'motion-canvas-narrator';
+const narrator = createVertexAINarrator({
+    projectId: 'your-google-cloud-project',
+    voiceName: 'Puck', // Options: Kore, Puck, Charon, Aoede
+    instruction: 'Speak naturally' // Optional voice instruction
+});
+```
+
+#### Using Minimax:
+```typescript
+import { createMinimaxNarrator } from 'motion-canvas-narrator';
+const narrator = createMinimaxNarrator({
+    apiKey: '<YOUR_MINIMAX_API_KEY>',
+    voiceId: 'your-voice-id'
+});
+```
+
+#### Using Mock Provider (for testing):
+```typescript
+import { createMockNarrator } from 'motion-canvas-narrator';
+const narrator = createMockNarrator({
+    wordsPerMinute: 150 // Optional, defaults to 120
 });
 ```
 
